@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Home- CodeJava</title>
+    <link rel="stylesheet" type="text/css" href="/css/indexstyle.css" />
+    
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to E-Commerce Web Page</h1>
+        <button type="button" onclick="connectToDatabase()">Connect</button>
+        <p id="result"></p>
+        <div>
+            <h3><a href="/signup_form">Register</a></h3>
+            <h3><a href="/login">Login</a></h3>
+            <h3><a href="/products">Products Page</a></h3>
+        </div>
+    </div>
+
+   <script>
+    function connectToDatabase() {
+        fetch('/connect')
+            .then(response => {
+                if (response.ok) {
+                    return "Connected to database successfully!";
+                } else {
+                    throw new Error('Error connecting to database');
+                }
+            })
+            .then(data => {
+                document.getElementById('result').innerText = data;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('result').innerText = error.message;
+            });
+    }
+</script>
+   
+</body>
+</html>

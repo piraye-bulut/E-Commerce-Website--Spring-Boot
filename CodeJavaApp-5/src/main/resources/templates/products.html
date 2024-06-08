@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products</title>
+    <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/css/bootstrap.min.css" />
+    <style>
+        /* Navbar stil tanımları */
+        .navbar {
+            background-color: #343a40;
+            padding: 20px 0;
+            color: #fff;
+            text-align: center;
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .navbar a:hover {
+            color: #ccc;
+        }
+
+        /* Arama çubuğu stil tanımları */
+        .search-bar {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .search-bar input[type="search"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 5px;
+            width: 300px;
+        }
+
+        .search-bar button {
+            padding: 8px 15px;
+            background-color: #28a745;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .search-bar button:hover {
+            background-color: #218838;
+        }
+
+        /* Ürün kartlarının stil tanımları */
+        .product-card {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        .product-info {
+            text-align: center;
+        }
+
+        .product-card img {
+            display: block;
+            margin: 0 auto 10px;
+        }
+
+        .product-info button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .product-info button:hover {
+            background-color: #0056b3;
+        }
+
+        .column {
+            width: 50%;
+            float: left;
+            box-sizing: border-box;
+            padding: 0 15px;
+        }
+
+        /* Sepet stil tanımları */
+        .cart {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            width: 300px;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .cart-header {
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+            color: #000; /* Kart metin rengi */
+        }
+
+        .cart-header h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .cart-items {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .cart-item {
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+            color: #000; /* Kart metin rengi */
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .cart-item .item-name {
+            font-weight: bold;
+        }
+
+        .cart-item .item-price {
+            float: right;
+        }
+
+        .cart-item .item-actions {
+            float: right;
+            margin-left: 10px;
+        }
+
+        .cart-total {
+            font-weight: bold;
+            margin-top: 10px;
+            color:black;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+   
+        <a href="#" onclick="showProducts('Technology')">Technology</a>
+        <a href="#" onclick="showProducts('Cosmetics')">Cosmetics</a>
+        <a href="#" onclick="showProducts('Clothes')">Clothes</a>
+        <div class="cart" id="cart">
+            <div class="cart-header">
+                <h3 style="color: #000;">My Shopping Card (<span id="cartItemCount">0</span>)</h3>
+            </div>
+            <ul class="cart-items" id="cartItems">
+                <!-- Sepet öğeleri buraya eklenecek -->
+            </ul>
+            <div class="cart-total">Total Cost: $<span id="cartTotal">0.00</span></div>
+        </div>
+    </div>
+
+    <!-- Arama Çubuğu -->
+    <div class="container">
+        <div class="row justify-content-center search-bar">
+            <div class="col-md-6">
+                <form class="form-inline" onsubmit="return false;">
+                    <input type="search" placeholder="Search" id="searchInput" onkeyup="searchProducts()">
+                    <button type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ürünler -->
+    <div class="container mt-3">
+        <div class="row" id="product-container">
+            <!-- Ürün kartları buraya gelecek -->
+        </div>
+    </div>
+
+    <script>
+   
+        // Sayfa yüklendiğinde varsayılan olarak Technology ürünlerini göster
+        window.onload = function() {
+            showProducts('Technology');
+        };
+
+        // Ürünleri gösteren JavaScript fonksiyonu
+        function showProducts(category) {
+            // Kategoriye göre ürünleri getir
+            var products = getProductsByCategory(category);
+
+            // Ürün kartlarını oluştur
+            var html = "";
+            products.forEach(function(product) {
+                html += `
+                    <div class="column">
+                        <div class="product-card">
+                            <div class="product-info">
+                                <h5>${product.name}</h5>
+                                <p>${product.description}</p>
+                                <p>Price: ${product.price}</p>
+                                <button onclick="addToCart('${product.name}', '${product.price}')">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Ürün kartlarını ekrana yazdır
+            document.getElementById("product-container").innerHTML = html;
+        }
+
+        // Ürünleri kategoriye göre getiren fonksiyon
+        function getProductsByCategory(category) {
+            var products = [];
+            // Kategorilere göre ürünleri döndür
+            switch (category) {
+                case "Technology":
+                    products = [
+                        { name: "Laptop", description: "Lenovo laptop.", price: "$1000" },
+                        { name: "Airpods", description: "Apple airpods.", price: "$120" },
+                        { name: "Macbook Air", description: "Computer laptop.", price: "$1500" },
+                        { name: "Samsung S3", description: "Telephone.", price: "$1000" },
+                        { name: "Ipad", description: "Apple IPAD.", price: "$500" },
+                        { name: "Mouse", description: "Computer mouse.", price: "$10" }
+                    ];
+                    break;
+                case "Cosmetics":
+                    products = [
+                        { name: "Chanel No.5", description: "Elegant perfume from Chanel.", price: "$150" },
+                        { name: "MAC Lipstick", description: "High-quality lipstick from MAC.", price: "$25" },
+                        { name: "Estée Lauder Foundation", description: "Long-lasting foundation from Estée Lauder.", price: "$50" },
+                        { name: "L'Oréal Mascara", description: "Volumizing mascara from L'Oréal.", price: "$10" },
+                        { name: "Maybelline Eyeshadow Palette", description: "Eyeshadow palette from Maybelline.", price: "$20" },
+                        { name: "Revlon Blush", description: "Blush from Revlon.", price: "$15" }
+                    ];
+                    break;
+                case "Clothes":
+                    products = [
+                        { name: "T-Shirt", description: "Cotton t-shirt.", price: "$20" },
+                        { name: "Jeans", description: "Blue jeans.", price: "$50" },
+                        { name: "Sweater", description: "Warm sweater.", price: "$30" },
+                        { name: "Dress", description: "Evening dress.", price: "$100" },
+                        { name: "Jacket", description: "Leather jacket.", price: "$80" },
+                        { name: "Shoes", description: "Running shoes.", price: "$70" }
+                    ];
+                    break;
+            }
+            return products;
+        }
+
+        // Ürünleri arayan JavaScript fonksiyonu
+        function searchProducts() {
+            var searchText = document.getElementById("searchInput").value.toLowerCase();
+            var productCards = document.querySelectorAll(".product-card");
+            productCards.forEach(function(card) {
+                var cardText = card.innerText.toLowerCase();
+                if (cardText.includes(searchText)) {
+                    card.style.display = "block";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+
+        // Sepete ürün ekleyen fonksiyon
+        function addToCart(name, price) {
+            var cartItemsElement = document.getElementById("cartItems");
+            var cartItemCountElement = document.getElementById("cartItemCount");
+            var cartTotalElement = document.getElementById("cartTotal");
+
+            // Yeni bir ürün öğesi oluştur
+            var newItem = document.createElement("li");
+            newItem.classList.add("cart-item");
+            newItem.innerHTML = `
+                <span class="item-name">${name}</span>
+                <span class="item-price">${price}</span>
+                <div class="item-actions">
+                    <button onclick="decrementItem(this)">-</button>
+                    <span class="quantity">1</span>
+                    <button onclick="incrementItem(this)">+</button>
+                    <button onclick="removeItem(this)">Remove</button>
+                </div>
+            `;
+
+            // Sepete yeni ürünü ekle
+            cartItemsElement.appendChild(newItem);
+
+            // Sepet öğe sayısını ve toplam fiyatı güncelle
+            var itemCount = parseInt(cartItemCountElement.textContent);
+            var totalPrice = parseFloat(cartTotalElement.textContent.substring(1));
+            cartItemCountElement.textContent = itemCount + 1;
+            cartTotalElement.textContent = "$" + (totalPrice + parseFloat(price.substring(1))).toFixed(2);
+        }
+
+        // Ürün adedini azaltan fonksiyon
+        function decrementItem(button) {
+            var item = button.parentNode.parentNode;
+            var priceElement = item.querySelector(".item-price");
+            var price = parseFloat(priceElement.textContent.substring(1));
+            var quantityElement = item.querySelector(".quantity");
+            var quantity = parseInt(quantityElement.textContent);
+            var totalPrice = parseFloat(document.getElementById("cartTotal").textContent.substring(1));
+
+            if (quantity > 1) {
+                quantity--;
+                quantityElement.textContent = quantity;
+                priceElement.textContent = "$" + (price / (quantity + 1) * quantity).toFixed(2);
+                document.getElementById("cartTotal").textContent = "$" + (totalPrice - price / (quantity + 1)).toFixed(2);
+            }
+        }
+
+        // Ürün adedini artıran fonksiyon
+        function incrementItem(button) {
+            var item = button.parentNode.parentNode;
+            var priceElement = item.querySelector(".item-price");
+            var price = parseFloat(priceElement.textContent.substring(1));
+            var quantityElement = item.querySelector(".quantity");
+            var quantity = parseInt(quantityElement.textContent);
+            var totalPrice = parseFloat(document.getElementById("cartTotal").textContent.substring(1));
+
+            quantity++;
+            quantityElement.textContent = quantity;
+            priceElement.textContent = "$" + (price / (quantity - 1) * quantity).toFixed(2);
+            document.getElementById("cartTotal").textContent = "$" + (totalPrice + price / (quantity - 1)).toFixed(2);
+        }
+
+        // Sepetten ürün çıkaran fonksiyon
+        function removeItem(button) {
+            var cartItemsElement = document.getElementById("cartItems");
+            var cartItemCountElement = document.getElementById("cartItemCount");
+            var cartTotalElement = document.getElementById("cartTotal");
+
+            var item = button.parentNode.parentNode;
+            var price = item.querySelector(".item-price").textContent;
+            var itemCount = parseInt(cartItemCountElement.textContent);
+            var totalPrice = parseFloat(cartTotalElement.textContent.substring(1));
+
+            item.remove();
+
+            // Sepet öğe sayısını ve toplam fiyatı güncelle
+            cartItemCountElement.textContent = itemCount - 1;
+            cartTotalElement.textContent = "$" + (totalPrice - parseFloat(price.substring(1))).toFixed(2);
+        }
+    </script>
+
+</body>
+
+</html>

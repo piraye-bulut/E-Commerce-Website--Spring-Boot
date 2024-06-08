@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration - CodeJava</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+            margin-top: 50px;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-title {
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-label {
+            display: inline-block;
+            width: 30%;
+            text-align: left;
+        }
+        .form-input {
+            display: inline-block;
+            width: 65%;
+        }
+        .btn-primary {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h1 class="form-title">User Registration - Sign Up</h1>
+            <form th:action="@{/signup_form}" method="post" th:object="${user}">
+                <div class="form-group">
+                    <label for="email" class="form-label">E-mail</label>
+                    <input type="email" name="email" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" name="password" class="form-input" required maxlength="15">
+                </div>
+                <div class="form-group">
+                    <label for="firstName" class="form-label">Name</label>
+                    <input type="text" name="firstName" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="lastName" class="form-label">Surname</label>
+                    <input type="text" name="lastName" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="birthDate" class="form-label">Birth Date</label>
+                    <input type="date" name="birthDate" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Sign Up</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
